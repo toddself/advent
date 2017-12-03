@@ -5,16 +5,14 @@ fn main() {
   let mut f = File::open("input.txt").expect("file not found");
   let mut contents = String::new();
   f.read_to_string(&mut contents).expect("something when wrong");
-  let rows: Vec<&str> = contents.trim().split("\n").collect();
-  let mut sol1: i32 = 0;
+  let rows: Vec<Vec<i32>> = contents.trim().split("\n").map(|row| row.split("\t").filter_map(|x| x.parse().ok()).collect()).collect();
   let mut sol2: i32 = 0;
 
-  for x in 0..rows.len() {
-    let row: Vec<i32> = rows[x].split("\t").filter_map(|x| x.parse().ok()).collect();
-    let min = row.iter().min().unwrap();
-    let max = row.iter().max().unwrap();
-    sol1 = sol1 + (max - min);
+  let checksum1 = rows.iter().fold(0, |acc, row| acc + (row.iter().max().unwrap() - row.iter().min().unwrap()));
+  println!("Checksum 1: {}", checksum1);
 
+  for x in 0..rows.len() {
+    let row = &rows[x];
     let lim = row.len();
     for i in 0..lim {
       let v = row[i];
@@ -28,6 +26,5 @@ fn main() {
     }
   }
 
-  println!("Checksum 1: {}", sol1);
   println!("Checksum 2: {}", sol2);
 }
