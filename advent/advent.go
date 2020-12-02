@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func GetData(day string) []int {
+func GetData(day string) []string {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -18,9 +18,12 @@ func GetData(day string) []int {
 	if err != nil {
 		panic(err)
 	}
+	return strings.Split(string(data), "\n")
+}
 
+func GetDataAsInt(day string) []int {
 	entries := []int{}
-	lines := strings.Split(string(data), "\n")
+	lines := GetData(day)
 	for _, n := range lines {
 		if val, err := strconv.Atoi(n); err == nil {
 			entries = append(entries, val)

@@ -9,7 +9,7 @@ import (
 func main() {
 	day1 := false
 	day2 := false
-	data := advent.GetData("day1")
+	data := advent.GetDataAsInt("day1")
 	for _, op1 := range data {
 		for _, op2 := range data {
 			if !day1 && op1+op2 == 2020 {
