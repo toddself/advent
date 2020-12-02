@@ -18,7 +18,8 @@ func GetData(day string) []string {
 	if err != nil {
 		panic(err)
 	}
-	return strings.Split(string(data), "\n")
+	d := strings.TrimSpace(string(data))
+	return strings.Split(d, "\n")
 }
 
 func GetDataAsInt(day string) []int {
