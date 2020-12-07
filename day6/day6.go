@@ -10,7 +10,7 @@ import (
 func countDupes(str string) int {
 	count := 0
 	countMap := make(map[string]int)
-	people := strings.Split(str, "\n")
+	people := strings.Split(strings.TrimSpace(str), "\n")
 	groupCount := len(people)
 	for _, person := range people {
 		for _, v := range strings.Split(person, "") {
@@ -27,7 +27,6 @@ func countDupes(str string) int {
 			count += 1
 		}
 	}
-
 	return count
 }
 
