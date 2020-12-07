@@ -2,32 +2,35 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/toddself/advent/advent"
 )
 
-func getPassports(entries []string) []map[string]string {
+func getPassports() []map[string]string {
 	var passports []map[string]string
-	current := ""
-	for _, row := range entries {
-		if row != "" {
-			current = fmt.Sprintf("%v %v\n", current, row)
-		} else {
-			pass := make(map[string]string)
-			for _, field := range strings.Split(strings.TrimSpace(current), " ") {
-				data := strings.Split(field, ":")
-				if len(data) == 2 {
-					pass[data[0]] = data[1]
-				} else {
-					fmt.Printf("invalid passport: %+v\n", current)
-				}
+
+	file, err := ioutil.ReadFile("day4/input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	data := strings.TrimSpace(string(file))
+	data = strings.ReplaceAll(string(file), "\n\n", "=")
+	data = strings.ReplaceAll(data, "\n", " ")
+
+	for _, row := range strings.Split(data, "=") {
+		pass := make(map[string]string)
+		for _, field := range strings.Split(strings.TrimSpace(row), " ") {
+			data := strings.Split(field, ":")
+			if len(data) == 2 {
+				pass[strings.TrimSpace(data[0])] = strings.TrimSpace(data[1])
+			} else {
+				fmt.Printf("invalid passport: %+v\n", row)
 			}
-			passports = append(passports, pass)
-			current = ""
 		}
+		passports = append(passports, pass)
 	}
 	return passports
 }
@@ -40,95 +43,97 @@ func dataAsInt(data string) int {
 	return i
 }
 
+func contains(haystack []string, needle string) bool {
+	for _, hay := range haystack {
+		if hay == needle {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
-	requiredFields := []string{"ecl", "pid", "eyr", "hcl", "byr", "iyr", "hgt"}
+	requiredFields := []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
 	validColor := regexp.MustCompile(`^#[A-Fa-f0-9]{6}$`)
 	validPid := regexp.MustCompile(`^[0-9]{9}$`)
-	validEye := "ambblubrngrygrnhzloth"
-	entries := advent.GetData("day4")
-	passports := getPassports(entries)
+	validYear := regexp.MustCompile(`^\d{4}$`)
+	validEye := []string{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
+
+	passports := getPassports()
 	totalPassports := len(passports)
 
 	invalidPart1Count := 0
 	invalidPart2Count := 0
-	invalid := false
-	invalidPart2 := false
+
 	for _, passport := range passports {
-		fmt.Printf("passport: %+v\n", passport)
-		for _, required := range requiredFields {
-			if data, ok := passport[required]; !ok && !invalid {
-				invalidPart1Count++
-				invalidPart2Count++
-				invalid = true
-				invalidPart2 = true
-			} else if !invalid && !invalidPart2 {
+		bad := false
+
+		for _, req := range requiredFields {
+			if _, ok := passport[req]; !ok {
+				bad = true
+			}
+		}
+
+		if bad {
+			invalidPart1Count += 1
+		}
+
+		// if the keys exist, validate for part2
+		if !bad {
+			for _, required := range requiredFields {
+				data := passport[required]
 				switch required {
 				case "byr":
 					birthyear := dataAsInt(data)
-					if birthyear < 1920 || birthyear > 2002 {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+					if validYear.MatchString(data) && (birthyear < 1920 || birthyear > 2002) {
+						bad = true
 					}
 				case "iyr":
 					issueYear := dataAsInt(data)
-					if issueYear < 2010 || issueYear > 2020 {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+					if validYear.MatchString(data) && (issueYear < 2010 || issueYear > 2020) {
+						bad = true
 					}
 				case "eyr":
 					expirationYear := dataAsInt(data)
-					if expirationYear < 2020 || expirationYear > 2030 {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+					if validYear.MatchString(data) && (expirationYear < 2020 || expirationYear > 2030) {
+						bad = true
 					}
 				case "hgt":
-					if strings.Contains(data, "cm") {
+					if strings.HasSuffix(data, "cm") {
 						cm := dataAsInt(strings.TrimSuffix(data, "cm"))
 						if cm < 150 || cm > 193 {
-							fmt.Printf("%+v invalid %+v\n", required, data)
-							invalidPart2 = true
-							invalidPart2Count++
+							bad = true
 						}
-					} else if strings.Contains(data, "in") {
+					} else if strings.HasSuffix(data, "in") {
 						in := dataAsInt(strings.TrimSuffix(data, "in"))
 						if in < 59 || in > 76 {
-							fmt.Printf("%+v invalid %+v\n", required, data)
-							invalidPart2 = true
-							invalidPart2Count++
+							bad = true
 						}
 					} else {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+						bad = true
 					}
 				case "hcl":
 					if !validColor.MatchString(data) {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+						bad = true
 					}
 				case "ecl":
-					if !strings.Contains(validEye, data) {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+					if !contains(validEye, data) {
+						bad = true
 					}
 				case "pid":
 					if !validPid.MatchString(data) {
-						fmt.Printf("%+v invalid %+v\n", required, data)
-						invalidPart2 = true
-						invalidPart2Count++
+						bad = true
 					}
 				}
 			}
 		}
-		invalid = false
-		invalidPart2 = false
+
+		if bad {
+			invalidPart2Count++
+		}
 	}
 
-	fmt.Printf("valid passports, part 1: %+v\n", (totalPassports - invalidPart1Count))
-	fmt.Printf("valid passports, part 2: %+v\n", (totalPassports - invalidPart2Count))
+	fmt.Printf("total passports: %+v\n", totalPassports)
+	fmt.Printf("valid passports, bad: %+v, part 1: %+v\n", invalidPart1Count, (totalPassports - invalidPart1Count))
+	fmt.Printf("valid passports, bad: %+v, part 2: %+v\n", invalidPart2Count, (totalPassports - invalidPart2Count))
 }
