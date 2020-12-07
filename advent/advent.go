@@ -33,3 +33,38 @@ func GetDataAsInt(day string) []int {
 
 	return entries
 }
+
+func GetDataGroups(day string) []string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	dataFile := path.Join(wd, day, "input.txt")
+	file, err := ioutil.ReadFile(dataFile)
+	if err != nil {
+		panic(err)
+	}
+
+	data := strings.TrimSpace(string(file))
+	data = strings.ReplaceAll(string(file), "\n\n", "=")
+	return strings.Split(data, "=")
+}
+
+func Contains(haystack []string, needle string) bool {
+	for _, hay := range haystack {
+		if hay == needle {
+			return true
+		}
+	}
+	return false
+}
+
+func Unique(haystack []string) []string {
+	var out []string
+	for _, v := range haystack {
+		if !Contains(out, v) {
+			out = append(out, v)
+		}
+	}
+	return out
+}

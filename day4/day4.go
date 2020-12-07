@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/toddself/advent/advent"
 )
 
 func getPassports() []map[string]string {
@@ -41,15 +43,6 @@ func dataAsInt(data string) int {
 		return -1
 	}
 	return i
-}
-
-func contains(haystack []string, needle string) bool {
-	for _, hay := range haystack {
-		if hay == needle {
-			return true
-		}
-	}
-	return false
 }
 
 func main() {
@@ -117,7 +110,7 @@ func main() {
 						bad = true
 					}
 				case "ecl":
-					if !contains(validEye, data) {
+					if !advent.Contains(validEye, data) {
 						bad = true
 					}
 				case "pid":

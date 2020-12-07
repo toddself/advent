@@ -11,15 +11,15 @@ func main() {
 	entries := advent.GetData("day5")
 	// entries := []string{"FBFBBFFRLR", "BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"}
 
-	rowMin := 0
-	rowMax := 127
-	colMin := 0
-	colMax := 7
 	seats := []int{}
 	maxSeat := 0
 	mySeat := 0
 
 	for _, entry := range entries {
+		rowMin := 0
+		rowMax := 127
+		colMin := 0
+		colMax := 7
 		for _, r := range entry {
 			if r == 'F' {
 				rowMax = ((rowMax - rowMin) / 2) + rowMin
@@ -36,10 +36,6 @@ func main() {
 		if maxSeat < id {
 			maxSeat = id
 		}
-		rowMin = 0
-		rowMax = 127
-		colMin = 0
-		colMax = 7
 	}
 
 	sl := len(seats)
