@@ -59,6 +59,15 @@ func Contains(haystack []string, needle string) bool {
 	return false
 }
 
+func ContainsInt(haystack []int, needle int) bool {
+	for _, hay := range haystack {
+		if hay == needle {
+			return true
+		}
+	}
+	return false
+}
+
 func Unique(haystack []string) []string {
 	var out []string
 	for _, v := range haystack {
