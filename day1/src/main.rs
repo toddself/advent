@@ -22,7 +22,7 @@ fn day1(data: Vec<isize>) -> (isize, isize) {
 }
 
 fn main() {
-    let data = libadvent::get_data_as_vec_isize();
+    let data = libadvent::get_data_as_vec::<isize>();
     let res = day1(data);
     println!("part 1: incremented {}", res.0);
     println!("part 2: incremented {}", res.1);
