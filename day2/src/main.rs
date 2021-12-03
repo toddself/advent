@@ -4,8 +4,16 @@ use std::str::FromStr;
 extern crate libadvent;
 
 #[derive(Debug)]
+enum Direction {
+    Forward,
+    Down,
+    Up,
+    Undefined,
+}
+
+#[derive(Debug)]
 struct Step {
-    direction: String,
+    direction: Direction,
     count: isize,
 }
 
@@ -15,8 +23,13 @@ impl FromStr for Step {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts: Vec<&str> = s.split(" ").collect();
         let direction = match parts.get(0) {
-            Some(d) => d.to_string(),
-            None => "".to_string(),
+            Some(d) => match *d {
+                "forward" => Direction::Forward,
+                "down" => Direction::Down,
+                "up" => Direction::Up,
+                _ => Direction::Undefined,
+            },
+            None => Direction::Undefined,
         };
         let count = match parts.get(1) {
             Some(c) => c.parse()?,
@@ -26,39 +39,29 @@ impl FromStr for Step {
     }
 }
 
-fn day2(data: Vec<Step>) -> (isize, isize, isize, isize) {
+fn day2(data: Vec<Step>) -> (isize, isize) {
     let mut x = 0;
     let mut y = 0;
     let mut y2 = 0;
-    let mut aim = 0;
     for step in data {
-        match step.direction.as_str() {
-            "forward" => {
+        match step.direction {
+            Direction::Forward => {
                 x += step.count;
-                y2 += aim * step.count;
+                y2 += y * step.count;
             }
-            "down" => {
-                y += step.count;
-                aim += step.count;
-            }
-            "up" => {
-                y -= step.count;
-                aim -= step.count;
-            }
-            x => {
-                println!("{} was not a valid direction", x);
-                continue;
-            }
+            Direction::Down => y += step.count,
+            Direction::Up => y -= step.count,
+            Direction::Undefined => {}
         };
     }
-    (x, y, x * y, y2)
+    (x * y, x * y2)
 }
 
 fn main() {
     let data = libadvent::get_data_as_vec::<Step>();
     let res = day2(data);
-    println!("part 1: total depth {}", res.2);
-    println!("part 2: total depth {}", res.3 * res.0);
+    println!("part 1: total depth {}", res.0);
+    println!("part 2: total depth {}", res.1);
 }
 
 #[cfg(test)]
@@ -69,34 +72,32 @@ mod tests {
     fn test_depth() {
         let data = vec![
             Step {
-                direction: "forward".to_string(),
+                direction: Direction::Forward,
                 count: 5,
             },
             Step {
-                direction: "down".to_string(),
+                direction: Direction::Down,
                 count: 5,
             },
             Step {
-                direction: "forward".to_string(),
+                direction: Direction::Forward,
                 count: 8,
             },
             Step {
-                direction: "up".to_string(),
+                direction: Direction::Up,
                 count: 3,
             },
             Step {
-                direction: "down".to_string(),
+                direction: Direction::Down,
                 count: 8,
             },
             Step {
-                direction: "forward".to_string(),
+                direction: Direction::Forward,
                 count: 2,
             },
         ];
         let res = day2(data);
-        assert_eq!(res.0, 15);
-        assert_eq!(res.1, 10);
-        assert_eq!(res.2, 150);
-        assert_eq!(res.3 * res.0, 900);
+        assert_eq!(res.0, 150);
+        assert_eq!(res.1, 900);
     }
 }
