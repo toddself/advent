@@ -58,7 +58,7 @@ fn day2(data: Vec<Step>) -> (isize, isize) {
 }
 
 fn main() {
-    let data = libadvent::get_data_as_vec::<Step>();
+    let data = libadvent::get_data_as_vec::<Step>(None);
     let res = day2(data);
     println!("part 1: total depth {}", res.0);
     println!("part 2: total depth {}", res.1);
@@ -70,32 +70,7 @@ mod tests {
 
     #[test]
     fn test_depth() {
-        let data = vec![
-            Step {
-                direction: Direction::Forward,
-                count: 5,
-            },
-            Step {
-                direction: Direction::Down,
-                count: 5,
-            },
-            Step {
-                direction: Direction::Forward,
-                count: 8,
-            },
-            Step {
-                direction: Direction::Up,
-                count: 3,
-            },
-            Step {
-                direction: Direction::Down,
-                count: 8,
-            },
-            Step {
-                direction: Direction::Forward,
-                count: 2,
-            },
-        ];
+        let data = libadvent::get_data_as_vec::<Step>(Some("test-input"));
         let res = day2(data);
         assert_eq!(res.0, 150);
         assert_eq!(res.1, 900);

@@ -22,7 +22,7 @@ fn day1(data: Vec<isize>) -> (isize, isize) {
 }
 
 fn main() {
-    let data = libadvent::get_data_as_vec::<isize>();
+    let data = libadvent::get_data_as_vec::<isize>(None);
     let res = day1(data);
     println!("part 1: incremented {}", res.0);
     println!("part 2: incremented {}", res.1);
@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn test_increment() {
-        let data = vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+        let data = libadvent::get_data_as_vec::<isize>(Some("test-input"));
         let res = day1(data);
         assert_eq!(res.0, 7);
         assert_eq!(res.1, 5);
